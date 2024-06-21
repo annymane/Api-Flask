@@ -78,6 +78,12 @@ def modificar_contacto(id):
 
     return contact_schema.jsonify(contact), 200
 
+# Endpoint para obtener un contacto por su id
+@app.route('/contacto/<int:id>', methods=['GET'])
+def obtener_contacto(id):
+    contact = Contact.query.get_or_404(id)
+    return contact_schema.jsonify(contact), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)
