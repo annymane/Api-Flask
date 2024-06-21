@@ -57,6 +57,26 @@ def obtener_contactos():
     result = contacts_schema.dump(all_contacts)
     return jsonify(result), 200
 
+# Definir el endpoint para modificar un contacto con su id
+@app.route('/contacto/<int:id>', methods=['PUT'])
+def modificar_contacto(id):
+    contact = Contact.query.get_or_404(id)
+
+    nombre = request.json.get('nombre', contact.nombre)
+    apellido = request.json.get('apellido', contact.apellido)
+    telefono = request.json.get('telefono', contact.telefono)
+    correo = request.json.get('correo', contact.correo)
+    favorito = request.json.get('favorito', contact.favorito)
+
+    contact.nombre = nombre
+    contact.apellido = apellido
+    contact.telefono = telefono
+    contact.correo = correo
+    contact.favorito = favorito
+
+    bdd.session.commit()
+
+    return contact_schema.jsonify(contact), 200
 
 
 if __name__ == '__main__':
