@@ -50,12 +50,23 @@ def agregar_contacto():
 
     return contact_schema.jsonify(new_contact), 201
 
-# Definir el endpoint para obtener todos los contactos
+# Definir el endpoint para obtener todos los contactos y realizar búsqueda paginada
 @app.route('/contacto', methods=['GET'])
 def obtener_contactos():
-    all_contacts = Contact.query.all()
-    result = contacts_schema.dump(all_contacts)
-    return jsonify(result), 200
+    page = int(request.args.get('page', 1))  
+    page_size = int(request.args.get('page_size', 10)) 
+
+    contacts_query = Contact.query.paginate(page=page, per_page=page_size, error_out=False)
+    contacts = contacts_query.items
+
+    result = contacts_schema.dump(contacts)
+    return jsonify({
+        "contactos": result,
+        "total_paginas": contacts_query.pages,
+        "total_contactos": contacts_query.total,
+        "pagina_actual": page,
+        "cantidad_a_observar": page_size
+    }), 200
 
 # Definir el endpoint para modificar un contacto con su id
 @app.route('/contacto/<int:id>', methods=['PUT'])
@@ -83,6 +94,15 @@ def modificar_contacto(id):
 def obtener_contacto(id):
     contact = Contact.query.get_or_404(id)
     return contact_schema.jsonify(contact), 200
+
+# Endpoint para eliminar un contacto por su id
+@app.route('/contacto/<int:id>', methods=['DELETE'])
+def eliminar_contacto(id):
+    contact = Contact.query.get_or_404(id)
+    bdd.session.delete(contact)
+    bdd.session.commit()
+    return jsonify({"message": "Contacto eliminado correctamente :)"}), 200
+
 
 
 if __name__ == '__main__':
