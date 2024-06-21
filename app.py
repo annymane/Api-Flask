@@ -50,5 +50,14 @@ def agregar_contacto():
 
     return contact_schema.jsonify(new_contact), 201
 
+# Definir el endpoint para obtener todos los contactos
+@app.route('/contacto', methods=['GET'])
+def obtener_contactos():
+    all_contacts = Contact.query.all()
+    result = contacts_schema.dump(all_contacts)
+    return jsonify(result), 200
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
